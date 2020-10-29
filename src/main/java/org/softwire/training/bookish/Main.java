@@ -1,38 +1,46 @@
 package org.softwire.training.bookish;
 
 import org.jdbi.v3.core.Jdbi;
+import org.softwire.training.bookish.services.Database;
 
 import java.sql.*;
+import java.util.Scanner;
 
 
 public class Main {
 
     public static void main(String[] args) throws SQLException {
-        String hostname = "localhost";
-        String database = "bookish";
-        String user = "root";
-        String password = "bookish1";
-        String connectionString = "jdbc:mysql://" + hostname + "/" + database + "?user=" + user + "&password=" + password + "&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=GMT&useSSL=false";
-
-        jdbcMethod(connectionString);
+        Database database = new Database();
+        Connection connection = database.initialise();
+        search(database, connection);
     }
-
-    private static void jdbcMethod(String connectionString) throws SQLException {
-        Connection connection = DriverManager.getConnection(connectionString);
-
-
-        String query = "select title from book";
-        try (Statement stmt = connection.createStatement()) {
-            ResultSet rs = stmt.executeQuery(query);
-            while (rs.next()) {
-                String title = rs.getString("title");
-
-                System.out.println(title);
-            }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());;
+    public static void search(Database database, Connection connection) throws SQLException {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Which functionality would you like to use? \n1. Get all books \n2. Search by title \n3. Search by author \n4. Search by genre \nPlease enter the number.");
+        String choice = scanner.nextLine();
+        if (choice.equals("1")) {
+            database.getAllBooks(connection);
+        }
+        else if (choice.equals("2")){
+            System.out.println("Enter title: ");
+            String title = scanner.nextLine();
+            database.getByTitle(connection, title);
+        }
+        else if (choice.equals("3")){
+            System.out.println("Enter author: ");
+            String author = scanner.nextLine();
+            database.getByAuthor(connection, author);
+        }
+        else if (choice.equals("4")){
+            System.out.println("Enter genre: ");
+            String genre = scanner.nextLine();
+            database.getByGenre(connection, genre);
         }
     }
+
+}
+
+
 
         // TODO: print out the details of all the books (using JDBC)
         // See this page for details: https://docs.oracle.com/javase/tutorial/jdbc/basics/processingsqlstatements.html
@@ -41,6 +49,6 @@ public class Main {
 
 
 
-}
+
 
 
